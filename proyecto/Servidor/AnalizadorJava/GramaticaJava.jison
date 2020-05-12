@@ -51,10 +51,10 @@
 "switch"			return 'tswitch';
 "case"				return 'tcase';
 "default"			return 'tdafault';
-"while"				return 'while';
-"do"				return 'do';
-"for"				return 'for';
-"break"				return 'break';
+"while"				return 'twhile';
+"do"				return 'tdo';
+"for"				return 'tfor';
+"break"				return 'tbreak';
 "void"				return 'tvoid';
 ":"					return 'dospuntos';
 ";"					return 'puntocoma';
@@ -80,8 +80,9 @@
 /*--------------------------------------------------SINTACTICO-----------------------------------------------*/
 
 /*-----ASOCIACION Y PRECEDENCIA-----*/
-%left tsuma tresta
-%left tmul tdiv
+%left tsuma tresta igualdad noigualdad
+%left tmul tdiv  tmenor tmayor
+%left tmayori tmenori
 %left para parc
 
 
@@ -112,29 +113,56 @@ cuerpoc: tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
        ;
 funcion:  parametro parc llavea cuerpovoid llavec { $$= instruccionesAPI.funcion($1,$4);};
 
-parametro: parametro coma parametrox{ $1.push($3) ; $$=$1}
-          |parametrox  {$$=[$1]}
-          | {$$=""}
+parametro: parametro coma parametrox{ $1.push($3) ; $$=$1;}
+          |parametrox  {$$=[$1];}
+          | {$$="";}
         ;
-parametrox: tipoDato id {$$=instruccionesAPI.parametro($1,$2) }
+parametrox: tipoDato id {$$=instruccionesAPI.parametro($1,$2); }
 ;
-cuerpovoid: {$$="cuerpo"}
+cuerpovoid: cuerpovoid cuerpovoidx {$1.push($2);$$=$1;}
+          | cuerpovoidx {$$=[$1];}
 ;
-tipoDato:tint {$$=$1}
- |tstring{$$=$1}
- |tboolean{$$=$1}
- |tdouble{$$=$1}
- |tchar {$$=$1} 
+
+
+cuerpovoidx: tif para condicion parc llavea cuerpovoid llavec elses { $$=instruccionesAPI.nuevoif($3,$6,$8); }
+            |tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
+            |id valores {$$=instruccionesAPI.variable($1,$2);}
+            | twhile para condicion parc llavea cuerpovoid llavec { $$=instruccionesAPI.nuevowhile($3,$6); }
+            | tdo llavea cuerpo llavec  while para condicion parc puntocoma { $$=instruccionesAPI.nuevodo($3,$7);} 
+
+            ;
+elses: telse tipodeelse{ $$=$2;}
+       |{$$="";}
+       ;
+tipodeelse:llavea cuerpovoid llavec {$$= instruccionesAPI.nuevoelse($2);}
+        |  tif para condicion parc llavea cuerpovoid llavec elses { $$=instruccionesAPI.nuevoif($3,$6,$8); }
+;
+
+/*------------------------------------------------COMPONER condicion -----------------------------------------------*/
+
+condicion:condicion tmayor condicion {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.MAYORQUE); }
+         |condicion tmayori condicion  {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.MAYORIGUAL); }
+         |condicion tmenor condicion   {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.MENORQUE); }
+         |condicion tmenori condicion  {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.MENORIGUAL); }
+         |condicion igualdad condicion {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.DIGUAL); }
+         |condicion noigualdad condicion {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.NOIGUAL); }
+         |EXP {$$=$1;}
+        ;
+tipoDato:tint {$$=$1;}
+ |tstring{$$=$1;}
+ |tboolean{$$=$1;}
+ |tdouble{$$=$1;}
+ |tchar {$$=$1;} 
  ;
-ids: ids coma idr { $1.push($3) ; $$=$1}
-   | idr  {$$=[$1]}
+ids: ids coma idr { $1.push($3) ; $$=$1;}
+   | idr  {$$=[$1];}
  ;
 idr: id {$$=instruccionesAPI.nuevoid($$=$1);}
  ;
 /*------------------------------------------------COMPONER LO VALORES -----------------------------------------------*/
-valores: puntocoma{$$=" "}
-       | tigual EXP puntocoma{$$=$2} 
-       | para funcion {$$=$2}
+valores: puntocoma{$$=" ";}
+       | tigual EXP puntocoma{$$=$2;} 
+       | para funcion {$$=$2;}
        ;
 EXP: para EXP parc   {  $$=$2; }
     |EXP tdiv EXP             {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.DIVISION); }

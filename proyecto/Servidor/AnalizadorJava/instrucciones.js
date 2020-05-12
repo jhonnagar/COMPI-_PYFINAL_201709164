@@ -8,24 +8,22 @@ const TIPO_VALOR = {
 
 // Constantes para los tipos de 'operaciones' que soporta nuestra gramática.
 const TIPO_OPERACION = {
-	SUMA:           'OP_SUMA',
-	RESTA:          'OP_RESTA',
-	MULTIPLICACION: 'OP_MULTIPLICACION',
-	DIVISION:       'OP_DIVISION',
-	NEGATIVO:       'OP_NEGATIVO',
-	MAYOR_QUE:      'OP_MAYOR_QUE',
-	MENOR_QUE:      'OP_MENOR_QUE',
+	SUMA:           'SUMA',
+	RESTA:          'RESTA',
+	MULTIPLICACION: 'MULTIPLICACION',
+	DIVISION:       'DIVISION',
+	NEGATIVO:       'NEGATIVO',
+	MAYORQUE:      'MAYOR_QUE',
+	MENORQUE:      'MENOR_QUE',
 
-	MAYOR_IGUAL: 	'OP_MAYOR_IGUAL',
-	MENOR_IGUAL:    'OP_MENOR_IGUAL',
-	DOBLE_IGUAL:    'OP_DOBLE_IGUAL',
-	NO_IGUAL:    	'OP_NO_IGUAL',
+	MAYORIGUAL: 	'MAYOR_IGUAL',
+	MENORIGUAL:    'MENOR_IGUAL',
+	DIGUAL:          'IGUAL',
+	NOIGUAL:    	'NO_IGUAL',
 
-	AND:  			'OP_AND',
-	OR: 			'OP_OR',
-	NOT:   			'OP_NOT',  	
-
-	CONCATENACION:  'OP_CONCATENACION'
+	AND:  			'AND',
+	OR: 			'OR',
+	NOT:   			'NOT',  	
 };
 
 // Constantes para los tipos de 'instrucciones' válidas en nuestra gramática.
@@ -37,6 +35,8 @@ const TIPO_INSTRUCCION = {
 	ASIGNACION:		'IASIGANCION',
 	IF:				'IF',
 	IF_ELSE:		'ELSE',
+	WHILE:          'WHILE',
+	DO:             'DO',
 	SWITCH:			'SWITCH',
 	VALOR:          'VALOR_VARIABLE',
 	PARAMETRO:       'PARAMETRO'
@@ -124,6 +124,35 @@ const instruccionesAPI = {
 			id:id,
 			parametros:parametros,
 			cuerpo:cuerpo
+		}
+	},
+	nuevoif: function(condicion , cuerpo,elses) {
+		return {
+			tipo: TIPO_INSTRUCCION.IF,
+			condicion:condicion,
+			cuerpo:cuerpo,
+			else:elses
+		}
+	},
+	nuevoelse: function( cuerpo) {
+		return {
+			cuerpo:cuerpo,
+		}
+	},
+
+	nuevowhile: function(condicion , cuerpo,elses) {
+		return {
+			tipo: TIPO_INSTRUCCION.WHILE,
+			condicion:condicion,
+			cuerpo:cuerpo
+		}
+	},
+	nuevodowhile: function(cuerpo,condicion) {
+		return {
+			tipo: TIPO_INSTRUCCION.DO_WHILE,
+			cuerpo:cuerpo,
+			condicion:condicion
+			
 		}
 	},
 
