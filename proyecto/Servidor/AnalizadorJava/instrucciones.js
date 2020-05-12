@@ -42,6 +42,8 @@ const TIPO_INSTRUCCION = {
 	CASE:			'CASE',
 	DEF_CASE:		'DE_FCASE',
 	VALOR:          'VALOR_VARIABLE',
+	PRINT:          'PRINT',
+	PRINTLN:          'PRINTLN',
 	PARAMETRO:       'PARAMETRO'
 }
 
@@ -189,10 +191,27 @@ const instruccionesAPI = {
 			
 		}
 	},
-	nuevodefcase: function(exprecion,cuerpo) {
+	nuevodefcase: function(cuerpo) {
 		return {
 			tipo: TIPO_INSTRUCCION.DEF_CASE,
 			cuerpo:cuerpo
+			
+			
+		}
+	},
+	nuevoprint: function(print) {
+		return {
+			tipo: TIPO_INSTRUCCION.PRINT,
+			print:print
+			
+			
+		}
+	}
+	,
+	nuevoprintln: function(print) {
+		return {
+			tipo: TIPO_INSTRUCCION.PRINTLN,
+			println:print
 			
 			
 		}

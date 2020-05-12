@@ -44,6 +44,9 @@
 
 "&&"			return 'tand';
 "||"			return 'tor';
+"system.out.println"     return 'tprintln';
+"system.out.print"  return 'tprint';
+"continue"    return 'tcontinue';
 "!"			    return 'tnot';
 "class"			return 'tclass';
 "import"			return 'timport';
@@ -67,7 +70,7 @@
 
 
 
-\"[^\"]*\"				{ yytext = yytext.substr(1,yyleng-2); return 'CADENA'; }
+\"[^\"]*\"				{ yytext = yytext.substr(1,yyleng-2); return 'cadena'; }
 [0-9]+("."[0-9]+)?\b  	return 'decimal';
 [0-9]+\b				return 'entero';
 ([a-zA-Z])[a-zA-Z0-9_]*	return 'id';
@@ -131,9 +134,11 @@ cuerpovoidx: tif para condicion parc llavea cuerpovoid llavec elses { $$=instruc
             | twhile para condicion parc llavea cuerpovoid llavec { $$=instruccionesAPI.nuevowhile($3,$6); }
             | tdo llavea cuerpo llavec  twhile para condicion parc puntocoma { $$=instruccionesAPI.nuevodo($3,$7);} 
             | tfor para idfor condicion puntocoma  id cambioid parc llavea cuerpovoid llavec  { $$=instruccionesAPI.nuevofor($3,$4,$7,$10);} 
-            | tswitch para EXP parc llavec casos llavea {$$=instruccionesAPI.nuevoswitch($3,$6);}
+            | tswitch para EXP parc llavea casos llavec {$$=instruccionesAPI.nuevoswitch($3,$6);}
+            | tprint para cadena parc puntocoma { $$= instruccionesAPI.nuevoprint ($3);} 
+            | tprintln para cadena parc puntocoma { $$= instruccionesAPI.nuevoprintln ($3);} 
             ;
-casos: casos nuevocaso{$1,push($2);$$=$1;} 
+casos: casos nuevocaso{$1.push($2);$$=$1;} 
        | nuevocaso {$$=[$1];}
        ;
 nuevocaso: tcase EXP dospuntos cuerpocase tbreak puntocoma {$$=instruccionesAPI.nuevocase($2,$4);}
