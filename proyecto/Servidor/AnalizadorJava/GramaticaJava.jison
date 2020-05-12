@@ -26,6 +26,7 @@
 "double"			return 'tdouble';
 "char"		    	return 'tchar';
 "--"			return 'tdecren';
+"++"			return 'taumen';
 "=="			return 'igualdad';
 "="	    		return 'tigual';
 "+"		    	return 'tsuma';
@@ -34,7 +35,7 @@
 "/"		    	return 'tdiv';
 "^"		    	return 'tpoten';
 "%"		    	return 'tmodul';
-"++"			return 'taumen';
+
 ">="			return 'tmayori';
 "<="			return 'tmenori';
 "!="			return 'noigualdad';
@@ -50,7 +51,7 @@
 "else"				return 'telse';
 "switch"			return 'tswitch';
 "case"				return 'tcase';
-"default"			return 'tdafault';
+"default"			return 'tdefault';
 "while"				return 'twhile';
 "do"				return 'tdo';
 "for"				return 'tfor';
@@ -128,9 +129,30 @@ cuerpovoidx: tif para condicion parc llavea cuerpovoid llavec elses { $$=instruc
             |tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
             |id valores {$$=instruccionesAPI.variable($1,$2);}
             | twhile para condicion parc llavea cuerpovoid llavec { $$=instruccionesAPI.nuevowhile($3,$6); }
-            | tdo llavea cuerpo llavec  while para condicion parc puntocoma { $$=instruccionesAPI.nuevodo($3,$7);} 
-
+            | tdo llavea cuerpo llavec  twhile para condicion parc puntocoma { $$=instruccionesAPI.nuevodo($3,$7);} 
+            | tfor para idfor condicion puntocoma  id cambioid parc llavea cuerpovoid llavec  { $$=instruccionesAPI.nuevofor($3,$4,$7,$10);} 
+            | tswitch para EXP parc llavec casos llavea {$$=instruccionesAPI.nuevoswitch($3,$6);}
             ;
+casos: casos nuevocaso{$1,push($2);$$=$1;} 
+       | nuevocaso {$$=[$1];}
+       ;
+nuevocaso: tcase EXP dospuntos cuerpocase tbreak puntocoma {$$=instruccionesAPI.nuevocase($2,$4);}
+        | tdefault  dospuntos cuerpocase tbreak puntocoma {$$=instruccionesAPI.nuevodefcase($3);}
+        ;
+cuerpocase: tif para condicion parc llavea cuerpovoid llavec elses { $$=instruccionesAPI.nuevoif($3,$6,$8); }
+            |tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
+            |id valores {$$=instruccionesAPI.variable($1,$2);}
+            | twhile para condicion parc llavea cuerpovoid llavec { $$=instruccionesAPI.nuevowhile($3,$6); }
+            | tdo llavea cuerpo llavec  twhile para condicion parc puntocoma { $$=instruccionesAPI.nuevodo($3,$7);} 
+            | tfor para idfor condicion puntocoma  id cambioid parc llavea cuerpovoid llavec  { $$=instruccionesAPI.nuevofor($3,$4,$7,$10);} 
+            | tswitch para EXP parc llavec casos llavea {$$=instruccionesAPI.nuevoswitch($3,$6);}
+            ;
+cambioid:taumen{$$=$1}
+         |tdecren{$$=$1};
+            
+idfor:tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
+        | id valores {$$=instruccionesAPI.variable($1,$2);}
+        ;
 elses: telse tipodeelse{ $$=$2;}
        |{$$="";}
        ;
@@ -170,4 +192,6 @@ EXP: para EXP parc   {  $$=$2; }
     |EXP tsuma EXP            {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.SUMA); }
     |EXP tresta EXP          { $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.RESTA); }
     |decimal                 { $$ = instruccionesAPI.nuevoValor(Number($1), TIPO_VALOR.NUMERO); }
-    |entero                  {  $$ = instruccionesAPI.nuevoValor(Number($1), TIPO_VALOR.NUMERO);  };
+    |entero                  {  $$ = instruccionesAPI.nuevoValor(Number($1), TIPO_VALOR.NUMERO);  }
+    |id  {  $$ = instruccionesAPI.nuevoValor($1, TIPO_VALOR.ID);  };
+    

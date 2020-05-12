@@ -2,7 +2,7 @@
 // Constantes para los tipos de 'valores' que reconoce nuestra gramática.
 const TIPO_VALOR = {
 	NUMERO:         'VAlOR_NUMERO',
-	IDENTIFICADOR:  'VALOR_IDENTIFICADOR',
+	ID:  'VALOR_ID',
 	CADENA:         'VALOR_CADENA',
 }
 
@@ -36,8 +36,11 @@ const TIPO_INSTRUCCION = {
 	IF:				'IF',
 	IF_ELSE:		'ELSE',
 	WHILE:          'WHILE',
-	DO:             'DO',
+	DO_WHILE:        'DO_WHILE',
+	FOR:              'FOR',
 	SWITCH:			'SWITCH',
+	CASE:			'CASE',
+	DEF_CASE:		'DE_FCASE',
 	VALOR:          'VALOR_VARIABLE',
 	PARAMETRO:       'PARAMETRO'
 }
@@ -147,7 +150,7 @@ const instruccionesAPI = {
 			cuerpo:cuerpo
 		}
 	},
-	nuevodowhile: function(cuerpo,condicion) {
+	nuevodo: function(cuerpo,condicion) {
 		return {
 			tipo: TIPO_INSTRUCCION.DO_WHILE,
 			cuerpo:cuerpo,
@@ -156,122 +159,49 @@ const instruccionesAPI = {
 		}
 	},
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-	nuevoAsignacion: function(identificador, expresionNumerica) {
+	nuevofor: function(Asignacion,condicion,decoaumen,cuerpo) {
 		return {
-			tipo: TIPO_INSTRUCCION.ASIGNACION,
-			identificador: identificador,
-			expresionNumerica: expresionNumerica
+			tipo: TIPO_INSTRUCCION.FOR,
+			variable:Asignacion,
+			condicion:condicion,
+			INCoDEC:decoaumen,
+			cuerpo:cuerpo
+		
+			
 		}
 	},
-
-	/**
-	 * Crea un objeto tipo Instrucción para la sentencia If.
-	 * @param {*} expresionLogica 
-	 * @param {*} instrucciones 
-	 */
-	nuevoIf: function(expresionLogica, instrucciones) {
-		return {
-			tipo: TIPO_INSTRUCCION.IF,
-			expresionLogica: expresionLogica,
-			instrucciones: instrucciones
-		}
-	},
-
-	/**
-	 * Crea un objeto tipo Instrucción para la sentencia If-Else.
-	 * @param {*} expresionLogica 
-	 * @param {*} instruccionesIfVerdadero 
-	 * @param {*} instruccionesIfFalso 
-	 */
-	nuevoIfElse: function(expresionLogica, instruccionesIfVerdadero, instruccionesIfFalso) {
-		return {
-			tipo: TIPO_INSTRUCCION.IF_ELSE,
-			expresionLogica: expresionLogica,
-			instruccionesIfVerdadero: instruccionesIfVerdadero,
-			instruccionesIfFalso: instruccionesIfFalso
-		}
-	},
-  
-	/**
-	 * Crea un objeto tipo Instrucción para la sentencia Switch.
-	 * @param {*} expresionNumerica 
-	
-	nuevoSwitch: function(expresionNumerica, casos) {
+	nuevoswitch: function(exprecion,listacase) {
 		return {
 			tipo: TIPO_INSTRUCCION.SWITCH,
-			expresionNumerica: expresionNumerica,
-			casos: casos
+			exprecion:exprecion,
+			listacase:listacase
+			
+			
+			
 		}
 	},
-
-	
-	 * Crea una lista de casos para la sentencia Switch.
-	 * @param {*} caso 
-	
-	nuevoListaCasos: function (caso) {
-		var casos = []; 
-		casos.push(caso);
-		return casos;
-	},
-
-	/**
-	 * Crea un objeto tipo OPCION_SWITCH para una CASO de la sentencia switch.
-	 * @param {*} expresionNumerica 
-	 * @param {*} instrucciones 
-	 
-	nuevoCaso: function(expresionNumerica, instrucciones) {
+	nuevocase: function(exprecion,cuerpo) {
 		return {
-			tipo: TIPO_OPCION_SWITCH.CASO,
-			expresionNumerica: expresionNumerica,
-			instrucciones: instrucciones
+			tipo: TIPO_INSTRUCCION.CASE,
+		  exprecion :exprecion,
+			cuerpo:cuerpo
+			
+			
 		}
 	},
-	/**
-	 * Crea un objeto tipo OPCION_SWITCH para un CASO DEFECTO de la sentencia switch.
-	 * @param {*} instrucciones 
-	 
-	nuevoCasoDef: function(instrucciones) {
+	nuevodefcase: function(exprecion,cuerpo) {
 		return {
-			tipo: TIPO_OPCION_SWITCH.DEFECTO,
-			instrucciones: instrucciones
+			tipo: TIPO_INSTRUCCION.DEF_CASE,
+			cuerpo:cuerpo
+			
+			
 		}
-	},
-    
-	/**
-	* Crea un objeto tipo Operador (+ , - , / , *) 
-	* @param {*} operador 
-	*/
-	nuevoOperador: function(operador){
-		return operador 
-	},
- 
-	/**
-	 * Crea un objeto tipo Instrucción para la sentencia Asignacion con Operador
-	 * @param {*} identificador 
-	 * @param {*} operador 
-	 * @param {*} expresionCadena 
-	 */
-	nuevoAsignacionSimplificada: function(identificador, operador , expresionNumerica){
-		return{
-			tipo: TIPO_INSTRUCCION.ASIGNACION_SIMPLIFICADA,
-			operador : operador,
-			expresionNumerica: expresionNumerica,
-			identificador : identificador
-		} 
 	}
+	
+
+
+ 
+	
 }
 // Exportamos nuestras constantes y nuestra API
 
