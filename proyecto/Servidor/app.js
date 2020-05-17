@@ -4,6 +4,7 @@ var express = require("express");
 var cors = require("cors");
 var bodyParser = require("body-parser");
 var gramatica = require("./AnalizadorJava/GramaticaJava");
+var gramaticaarbol = require("./AnalizadorJava/reporte");
 var Errores_1 = require("./JavaAST/Errores");
 var app = express();
 app.use(bodyParser.json());
@@ -15,6 +16,12 @@ app.post('/Calcular/', function (req, res) {
     Errores_1.Errores.clear();
     res.send(resultado);
 });
+
+app.post('/Arbol/', function (req, res) {
+    var entrada = req.body.text;
+    var resultado = parserarbol(entrada)
+    res.send(resultado);
+});
 /*---------------------------------------------------------------*/
 var server = app.listen(8080, function () {
     console.log('Servidor escuchando en puerto 8080...');
@@ -24,6 +31,15 @@ function parser(texto) {
     try {   
          var resultado =gramatica.parse(texto);
            var ast = JSON.stringify(resultado, null, 2);
+        return ast;
+    }
+    catch (e) {
+        return "Error en compilacion de Entrada: " + e.toString();
+    }
+}
+function parserarbol(texto) {
+    try {   
+         var ast =gramaticaarbol.parse(texto);
         return ast;
     }
     catch (e) {

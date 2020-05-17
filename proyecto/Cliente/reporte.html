@@ -1,0 +1,65 @@
+<!DOCTYPE html> 
+
+<html> 
+    <head> 
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <link href="../css/layout.css" rel="stylesheet" type="text/css" media="all">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="../dist/style.min.css" />
+        <script src="../dist/jstree.min.js"></script>
+        <script src="../js/nuevo1.js"></script>
+ 
+    </head> 
+    <body> 
+     <input type="button" onclick="addNokia()" value="Add Nokia"/> 
+     <input type="button" onclick="deleteDalmatian()" value="Delete Dalmatian"/> 
+     <div id="jstree"></div> 
+     <div id="data" class="demo"></div>
+     <script> 
+    
+$data1 = [
+      { "text" : "Root node", "children" : [
+        { "text" : "Child node 1" },
+        { "text" : "Child node 2" }
+      ]}
+    ]
+    
+$data2 = [
+      { "text" : "Nodo Raiz", "children" : [
+        { "text" : "Nodo hijo 1" },
+        { "text" : "Nodo hijo 2" }
+      ]}
+    ]
+$('#data').jstree({
+  'core' : {
+    'data' : $data1,
+    'check_callback' : true
+	},
+  'types' : {
+    '#' : {
+      'max_depth': 2
+    },
+    'default' : { 
+      'valid_children' : ['default','folder'],
+      'max_children': 4
+    }
+  },
+  'plugins' : ['dnd']
+});
+function resfreshJSTree() { 
+       $('#data').jstree(true).settings.core.data = $data2;
+       $('#data').jstree(true).refresh();
+      }
+
+      function addNokia() { 
+   
+       resfreshJSTree(); 
+      } 
+      function deleteDalmatian() { 
+   
+       resfreshJSTree(); 
+      } 
+     </script> 
+    </body> 
+</html>     

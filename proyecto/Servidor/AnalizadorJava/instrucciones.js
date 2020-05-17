@@ -2,8 +2,13 @@
 // Constantes para los tipos de 'valores' que reconoce nuestra gramática.
 const TIPO_VALOR = {
 	NUMERO:         'VAlOR_NUMERO',
-	ID:  'VALOR_ID',
+	NUMERONEG:         'VAlOR_NUMERO_NEGATIVO',
+	ID:             'VALOR_ID',
 	CADENA:         'VALOR_CADENA',
+	CHAR: 			'CHAR',
+	BOOL:           'BOOL',
+	MASMAS:         'MASMAS',
+	MENOSMENOS:     'MENOSMENOS'
 }
 
 // Constantes para los tipos de 'operaciones' que soporta nuestra gramática.
@@ -44,7 +49,10 @@ const TIPO_INSTRUCCION = {
 	VALOR:          'VALOR_VARIABLE',
 	PRINT:          'PRINT',
 	PRINTLN:          'PRINTLN',
-	PARAMETRO:       'PARAMETRO'
+	PARAMETRO:       'PARAMETRO',
+	BREAK:  'BREAK',
+	CONTINUE:'CONTINUE',
+	RETURN:  'RETURN'
 }
 
 function nuevaOperacion(operandoIzq, operandoDer, tipo) {
@@ -67,6 +75,21 @@ const instruccionesAPI = {
 		return {
 			tipo: tipo,
 			valor: valor
+		}
+	},	
+
+
+	nuevalorfunc: function(id,parametro) {
+		return {
+			tipo: TIPO_INSTRUCCION.FUNCION,
+			id: id,
+			parametro: parametro
+		}
+	},	
+	nuevonot: function(valor) {
+		return {
+			tipo: TIPO_OPERACION.NOT,
+			condicion: valor
 		}
 	},
 	class: function (id,instrucciones) {
@@ -215,7 +238,30 @@ const instruccionesAPI = {
 			
 			
 		}
+	},
+	nuevoreturn: function(valor) {
+		return {
+			tipo: TIPO_INSTRUCCION.RETURN,
+			valor: valor 
+			
+		}
 	}
+	,
+	nuevobreak: function() {
+		return {
+			tipo: TIPO_INSTRUCCION.BREAK
+			
+		}
+	}
+	
+	,
+	nuevocontinue: function() {
+		return {
+			tipo: TIPO_INSTRUCCION.CONTINUE
+			
+		}
+	}
+	
 	
 
 

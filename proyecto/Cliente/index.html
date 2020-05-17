@@ -1,13 +1,55 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Ejemplo</title>
+    <title>PY_2:COMPI1_201709164</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="../css/layout.css" rel="stylesheet" type="text/css" media="all">
-    <script src="../js/nuevo.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="../dist/style.min.css" />
+    <script src="../dist/jstree.min.js"></script>
+    <script src="../js/nuevo2.js"></script>
   </head>
   <body>
+    <input type="button" onclick="llenarast()" value="llenarast"/> 
+  
+    <div id="jstree"></div> 
+    <div id="data" class="demo"></div>
+    <script> 
+   
+$data1 = [
+     { "text" : "Root node", "children" : [
+       { "text" : "Child node 1" },
+       { "text" : "Child node 2" }
+     ]}
+   ]
+$('#data').jstree({
+ 'core' : {
+   'data' : $data1,
+   'check_callback' : true
+ },
+ 'types' : {
+   '#' : {
+     'max_depth': 2
+   },
+   'default' : { 
+     'valid_children' : ['default','folder'],
+     'max_children': 4
+   }
+ },
+ 'plugins' : ['dnd']
+});
+function resfreshJSTree() { 
+      $('#data').jstree(true).settings.core.data = ast();
+      $('#data').jstree(true).refresh();
+     }
+
+     function llenarast() { 
+      Conn1();
+      resfreshJSTree(); 
+     } 
+ 
+    </script> 
 
     <div class="wrapper row3">
       <main class="container clear">
@@ -16,12 +58,12 @@
           <textarea id="operacion" rows="20" cols="50"></textarea>  <textarea id="resultado" rows="20" cols="50"></textarea>
           <button onclick="Conn()">Calcular</button>
           
+
         </div>
         <div class="clear"></div>
       </main>
     </div>
 
-    <script src="../js/jquery.min.js"></script>
     <script src="../js/jquery.backtotop.js"></script>
     <script src="../js/jquery.mobilemenu.js"></script>
   </body>
