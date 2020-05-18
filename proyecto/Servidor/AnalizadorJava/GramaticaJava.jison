@@ -10,7 +10,6 @@
 /* Definición Léxica */
 %lex
 
-%options case-insensitive
 
 %%
 
@@ -20,7 +19,7 @@
 
 "imprimir"		return 'timprime';
 "numero"		return 'rnumero';
-"string"		return 'tstring';
+"String"		return 'tstring';
 "int"			return 'tint';
 "boolean"		return 'tboolean';
 "double"	        return 'tdouble';
@@ -44,8 +43,8 @@
 
 "&&"			return 'tand';
 "||"			return 'tor';
-"system.out.println"     return 'tprintln';
-"system.out.print"  return 'tprint';
+"System.out.println"     return 'tprintln';
+"System.out.print"  return 'tprint';
 "continue"    return 'tcontinue';
 "!"			    return 'tnot';
 "class"			return 'tclass';
@@ -79,7 +78,7 @@
 \'[^\"]?\'				{ yytext = yytext.substr(1,yyleng-2); return 'char'; }
 [0-9]+("."[0-9]+)\b  	return 'decimal';
 [0-9]+\b				return 'entero';
-([a-zA-Z])[a-zA-Z0-9_]*	return 'id';
+([a-zA-Z_])[a-zA-Z0-9_]*	return 'id';
 
 
 <<EOF>>				return 'EOF';
@@ -90,8 +89,8 @@
 /*--------------------------------------------------SINTACTICO-----------------------------------------------*/
 
 /*-----ASOCIACION Y PRECEDENCIA-----*/
-%left tsuma tresta igualdad noigualdad
-%left tmul tdiv  tmenor tmayor
+%left tsuma tresta igualdad noigualdad EXP
+%left tmul tdiv  tmenor tmayor condicion
 %left tmayori tmenori tmodul tpoten
 %left para parc tand tor 
 %left tnot 
@@ -139,7 +138,7 @@ cuerpovoidx: tif para condicion parc llavea cuerpovoid llavec elses { $$=instruc
             |tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
             |id valores {$$=instruccionesAPI.variable($1,$2);}
             | twhile para condicion parc llavea cuerpovoid llavec { $$=instruccionesAPI.nuevowhile($3,$6); }
-            | tdo llavea cuerpo llavec  twhile para condicion parc puntocoma { $$=instruccionesAPI.nuevodo($3,$7);} 
+            | tdo llavea cuerpovoid llavec  twhile para condicion parc puntocoma { $$=instruccionesAPI.nuevodo($3,$7);} 
             | tfor para idfor condicion puntocoma  id cambioid parc llavea cuerpovoid llavec  { $$=instruccionesAPI.nuevofor($3,$4,$7,$10);} 
             | tswitch para EXP parc llavea casos llavec {$$=instruccionesAPI.nuevoswitch($3,$6);}
             | tprint para EXP parc puntocoma { $$= instruccionesAPI.nuevoprint ($3);} 
@@ -154,7 +153,10 @@ casos: casos nuevocaso{$1.push($2);$$=$1;}
 nuevocaso: tcase EXP dospuntos cuerpocase tbreak puntocoma {$$=instruccionesAPI.nuevocase($2,$4);}
         | tdefault  dospuntos cuerpocase tbreak puntocoma {$$=instruccionesAPI.nuevodefcase($3);}
         ;
-cuerpocase: tif para condicion parc llavea cuerpovoid llavec elses { $$=instruccionesAPI.nuevoif($3,$6,$8); }
+cuerpocase: cuerpocase cuerpocasex {$1.push($2);$$=$1;}
+          | cuerpocasex {$$=[$1];}
+ ;
+cuerpocasex: tif para condicion parc llavea cuerpovoid llavec elses { $$=instruccionesAPI.nuevoif($3,$6,$8); }
             |tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
             |id valores {$$=instruccionesAPI.variable($1,$2);}
             | twhile para condicion parc llavea cuerpovoid llavec { $$=instruccionesAPI.nuevowhile($3,$6); }
@@ -172,7 +174,7 @@ treturnc: EXP puntocoma{$$=$1;}
 cambioid:taumen{$$=$1}
          |tdecren{$$=$1};
             
-idfor:tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
+idfor:  tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
         | id valores {$$=instruccionesAPI.variable($1,$2);}
         ;
 elses: telse tipodeelse{ $$=$2;}
@@ -194,6 +196,7 @@ condicion:condicion tmayor condicion {  $$ = instruccionesAPI.nuevoOperacionBina
          |condicion tor condicion {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.OR); }
          |tnot condicion {   $$=instruccionesAPI.nuevonot($2);}
          |EXP {$$=$1;}
+         | para condicion parc{$$=$2;}
         ;
 tipoDato:tint {$$=$1;}
  |tstring{$$=$1;}
@@ -215,6 +218,8 @@ valores: puntocoma{$$=" ";}
        ;
 EXP: para EXP parc   {  $$=$2; }
     |tresta entero %prec UTresta  {  $$ = instruccionesAPI.nuevoValor(Number($2), TIPO_VALOR.NUMERONEG);  }	
+       |EXP tpoten EXP             {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.POTENCIA); }
+          |EXP tmodul EXP             {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.MODULO); }
     |EXP tdiv EXP             {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.DIVISION); }
     |EXP tmul EXP             {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.MULTIPLICACION); }
     |EXP tsuma EXP            {  $$ = instruccionesAPI.nuevoOperacionBinaria($1, $3, TIPO_OPERACION.SUMA); }
@@ -229,7 +234,12 @@ EXP: para EXP parc   {  $$=$2; }
     |id para idx parc {  $$ = instruccionesAPI.nuevalorfunc($1,$3);  }
     ;
 
-    idx: ids {$$=$1}
-        | {""}
-        ;
+idx: idex {$$=$1}
+| {""}
+;
+idex: idex coma idxr { $1.push($3) ; $$=$1;}
+| idxr  {$$=[$1];}
+;
+idxr: condicion {$$=instruccionesAPI.nuevoid($1);}
     
+;

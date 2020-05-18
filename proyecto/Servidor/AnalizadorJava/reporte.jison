@@ -9,8 +9,6 @@
 /* Definición Léxica */
 %lex
 
-%options case-insensitive
-
 %%
 
 \s+											// se ignoran espacios en blanco
@@ -19,7 +17,7 @@
 
 "imprimir"		return 'timprime';
 "numero"		return 'rnumero';
-"string"		return 'tstring';
+"String"		return 'tstring';
 "int"			return 'tint';
 "boolean"		return 'tboolean';
 "double"	        return 'tdouble';
@@ -43,8 +41,8 @@
 
 "&&"			return 'tand';
 "||"			return 'tor';
-"system.out.println"     return 'tprintln';
-"system.out.print"  return 'tprint';
+"System.out.println"     return 'tprintln';
+"System.out.print"  return 'tprint';
 "continue"    return 'tcontinue';
 "!"			    return 'tnot';
 "class"			return 'tclass';
@@ -78,7 +76,7 @@
 \'[^\"]?\'				{ yytext = yytext.substr(1,yyleng-2); return 'char'; }
 [0-9]+("."[0-9]+)\b  	return 'decimal';
 [0-9]+\b				return 'entero';
-([a-zA-Z])[a-zA-Z0-9_]*	return 'id';
+([a-zA-Z_])[a-zA-Z0-9_]*	return 'id';
 
 
 <<EOF>>				return 'EOF';
@@ -89,8 +87,8 @@
 /*--------------------------------------------------SINTACTICO-----------------------------------------------*/
 
 /*-----ASOCIACION Y PRECEDENCIA-----*/
-%left tsuma tresta igualdad noigualdad
-%left tmul tdiv  tmenor tmayor
+%left tsuma tresta igualdad noigualdad EXP
+%left tmul tdiv  tmenor tmayor condicion
 %left tmayori tmenori tmodul tpoten
 %left para parc tand tor 
 %left tnot 
@@ -135,35 +133,39 @@ cuerpovoid: cuerpovoid cuerpovoidx {$1.push($2);$$=$1;}
 
 
 cuerpovoidx: tif para condicion parc llavea cuerpovoid llavec elses { $$={text:'IF',children:[{text:' condicion',children:$3},{text:'cuerpo',children:$6},{text:'else',children:$8}]}; }
-            |tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
-            |id valores {$$=instruccionesAPI.variable($1,$2);}
-            | twhile para condicion parc llavea cuerpovoid llavec { $$=instruccionesAPI.nuevowhile($3,$6); }
-            | tdo llavea cuerpo llavec  twhile para condicion parc puntocoma { $$=instruccionesAPI.nuevodo($3,$7);} 
-            | tfor para idfor condicion puntocoma  id cambioid parc llavea cuerpovoid llavec  { $$=instruccionesAPI.nuevofor($3,$4,$7,$10);} 
-            | tswitch para EXP parc llavea casos llavec {$$=instruccionesAPI.nuevoswitch($3,$6);}
-            | tprint para EXP parc puntocoma { $$= instruccionesAPI.nuevoprint ($3);} 
-            | tprintln para EXP parc puntocoma { $$= instruccionesAPI.nuevoprintln ($3);} 
-            | tcontinue puntocoma {$$=instruccionesAPI.nuevocontinue();}
-            | tbreak  puntocoma {$$=instruccionesAPI.nuevobreak();}
+            |tipoDato ids valores  {$$={text:'declaracion '+$1,children:[{text:'ids',children:$2},{text:'valores',children:$3}]};}
+            | id valores {$$={text:'valor '+$1,children:$2};} 
+            | twhile para condicion parc llavea cuerpovoid llavec { $$={text:'WHILE',children:[{text:' condicion',children:$3},{text:'cuerpo',children:$6}]}; }
+            | tdo llavea cuerpovoid llavec  twhile para condicion parc puntocoma { $$={text:'do',children:[{text:' cuerpo',children:$3},{text:'condicion',children:$7}]}; } 
+            | tfor para idfor condicion puntocoma  id cambioid parc llavea cuerpovoid llavec  { $$={text:'FOR',children:[{text:'variable',children:[$3]},{text:'condicion',children:$4},{text:$6,children:[{text:$7}]},{text:'cuerpo',children:$10}]};} 
+            | tswitch para EXP parc llavea casos llavec {$$={text:'switch',children:[{text:'expresion',children:$3},{text:'casos',children:$6}]};}
+            | tprint para EXP parc puntocoma { $$= {text:'print',children:$3};} 
+            | tprintln para EXP parc puntocoma { $$= {text:'print',children:$3};} 
+            | tcontinue puntocoma {$$={text:'continue'};}
+            | tbreak  puntocoma {$$={text:'break'};}
             | treturn treturnc {$$={text:'return',children:$2}}
             ;
 casos: casos nuevocaso{$1.push($2);$$=$1;} 
        | nuevocaso {$$=[$1];}
        ;
-nuevocaso: tcase EXP dospuntos cuerpocase tbreak puntocoma {$$=instruccionesAPI.nuevocase($2,$4);}
-        | tdefault  dospuntos cuerpocase tbreak puntocoma {$$=instruccionesAPI.nuevodefcase($3);}
+nuevocaso: tcase EXP dospuntos cuerpocase tbreak puntocoma {$$={text:'case',children:[{text:'valor',children:$2},{text:'cuerpo',children:$4}]};}
+        | tdefault  dospuntos cuerpocase tbreak puntocoma {$$={text:'default',children:$3};}
         ;
-cuerpocase: tif para condicion parc llavea cuerpovoid llavec elses { $$=instruccionesAPI.nuevoif($3,$6,$8); }
-            |tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
-            |id valores {$$=instruccionesAPI.variable($1,$2);}
-            | twhile para condicion parc llavea cuerpovoid llavec { $$=instruccionesAPI.nuevowhile($3,$6); }
-            | tdo llavea cuerpo llavec  twhile para condicion parc puntocoma { $$=instruccionesAPI.nuevodo($3,$7);} 
-            | tfor para idfor condicion puntocoma  id cambioid parc llavea cuerpovoid llavec  { $$=instruccionesAPI.nuevofor($3,$4,$7,$10);} 
-            | tswitch para EXP parc llavec casos llavea {$$=instruccionesAPI.nuevoswitch($3,$6);}
-            | tprint para EXP parc puntocoma { $$= instruccionesAPI.nuevoprint ($3);} 
-            | tprintln para EXP parc puntocoma { $$= instruccionesAPI.nuevoprintln ($3);} 
-            | tcontinue puntocoma {$$=instruccionesAPI.nuevocontinue();}
-            | treturn treturnc {$$=instruccionesAPI.nuevoreturn($2);}
+cuerpocase: cuerpocase cuerpocasex {$1.push($2);$$=$1;}
+          | cuerpocasex {$$=[$1];}
+ ;
+
+cuerpocasex:  tif para condicion parc llavea cuerpovoid llavec elses { $$={text:'IF',children:[{text:' condicion',children:$3},{text:'cuerpo',children:$6},{text:'else',children:$8}]}; }
+            |tipoDato ids valores  {$$={text:'declaracion '+$1,children:[{text:'ids',children:$2},{text:'valores',children:$3}]};}
+            | id valores {$$={text:'valor '+$1,children:$2};} 
+            | twhile para condicion parc llavea cuerpovoid llavec { $$={text:'WHILE',children:[{text:' condicion',children:$3},{text:'cuerpo',children:$6}]}; }
+            | tdo llavea cuerpovoid llavec  twhile para condicion parc puntocoma { $$={text:'do',children:[{text:' cuerpo',children:$3},{text:'condicion',children:$7}]}; } 
+            | tfor para idfor condicion puntocoma  id cambioid parc llavea cuerpovoid llavec { $$={text:'FOR',children:[{text:'variable',children:[$3]},{text:'condicion',children:$4},{text:$6,children:[{text:$7}]},{text:'cuerpo',children:$10}]};} 
+            | tswitch para EXP parc llavea casos llavec {$$={text:'switch',children:[{text:'expresion',children:$3},{text:'casos',children:$6}]};}
+            | tprint para EXP parc puntocoma { $$= {text:'print',children:$3};} 
+            | tprintln para EXP parc puntocoma { $$= {text:'print',children:$3};} 
+            | tcontinue puntocoma {$$={text:'continue'};}
+            | treturn treturnc {$$={text:'return',children:$2}}
             ;
 treturnc: EXP puntocoma{$$=$1;}
         |puntocoma{$$="";}
@@ -171,14 +173,14 @@ treturnc: EXP puntocoma{$$=$1;}
 cambioid:taumen{$$=$1}
          |tdecren{$$=$1};
             
-idfor:tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
-        | id valores {$$=instruccionesAPI.variable($1,$2);}
+idfor:tipoDato id valores  {$$={text:'declaracion '+$1,children:[{text:'id'+$2},{text:'valor',children:$3}]};}
+      | id valores {$$={text:'valor '+$1,children:$2};}
         ;
 elses: telse tipodeelse{ $$=$2;}
        |{$$="";}
        ;
 tipodeelse:llavea cuerpovoid llavec {$$=$2;}
-        |  tif para condicion parc llavea cuerpovoid llavec elses { $$={text:'IF',children:[{text:' condicion',children:$3},{text:'cuerpo',children:$6},{text:'else',children:$8}]}; }
+        |  tif para condicion parc llavea cuerpovoid llavec elses { $$=[{text:'IF',children:[{text:' condicion',children:$3},{text:'cuerpo',children:$6},{text:'else',children:$8}]}]; }
 ;
 
 /*------------------------------------------------COMPONER condicion -----------------------------------------------*/
@@ -187,12 +189,13 @@ condicion:condicion tmayor condicion    {  $$ = [{text:'izq',children:$1},{text:
          |condicion tmayori condicion   {  $$ = [{text:'izq',children:$1},{text:'MAYOR_IGUAL'},{text:'der',children:$3}]; }
          |condicion tmenor condicion    {  $$ = [{text:'izq',children:$1},{text:'MENOR'},{text:'der',children:$3}]; }
          |condicion tmenori condicion   {  $$ = [{text:'izq',children:$1},{text:'MENOR-IGUAL'},{text:'der',children:$3}]; }
-         |condicion igualdad condicion  {  $$ = [{text:'izq',children:$1},{text:'IGUAL'},{te   xt:'der',children:$3}]; }
+         |condicion igualdad condicion  {  $$ = [{text:'izq',children:$1},{text:'IGUAL'},{text:'der',children:$3}]; }
          |condicion noigualdad condicion{  $$ = [{text:'izq',children:$1},{text:'NO_IGUAL'},{text:'der',children:$3}]; }
          |condicion tand condicion      {  $$ = [{text:'izq',children:$1},{text:'AND'},{text:'der',children:$3}]; }
          |condicion tor condicion       {  $$ = [{text:'izq',children:$1},{text:'OR'},{text:'der',children:$3}]; }
          |tnot condicion {   $$=[{text:'not',children:$2}];}
-         |EXP {$$=$1;}d
+         |EXP {$$=$1;}
+         | para condicion parc{$$=$2;}
         ;
 tipoDato:tint {$$=$1;}
  |tstring{$$=$1;}
@@ -230,7 +233,12 @@ EXP: para EXP parc   {  $$=$2; }
     |id para idx parc {  $$ =[{text:$1}, {text:'parametros',children:$3}];}
     ;
 
-idx: ids {$$=$1}
-        | {}
-        ;
+idx: idex {$$=$1}
+    | {""}
+    ;
+idex: idex coma idxr { $1.push($3) ; $$=$1;}
+    | idxr  {$$=[$1];}
+    ;
+idxr: condicion {$$={text:'parametros',children:$1};}   
+    ;
     
