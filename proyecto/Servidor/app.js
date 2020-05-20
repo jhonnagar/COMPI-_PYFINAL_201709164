@@ -73,8 +73,9 @@ function procesarCLASS(resultado){
    
         if (instruccion.tipo === TIPO_INSTRUCCION.CLASS) {
             if (resultado.id===instruccion.id){
-                var cantidadvoid =  procesarVOID(resultado.cuerpo,instruccion.cuerpo,resultado.id);
-                Errores_1.Errores.add(new CNodoError.NodoError("copia","id en la clase "+resultado.id+" coincide",0,0));
+                var canti=  procesarVOID(resultado.cuerpo,instruccion.cuerpo,resultado.id);
+                Errores_1.Errores.add(new CNodoError.NodoError("copia","id en la clase "+resultado.id+" coincide </br>"+
+                "metodos que coinciden ("+canti+")",0,0));
             }
         } });
 
@@ -88,19 +89,23 @@ function comparar(resultado) {
         } });
 }
 function procesarVOID(cuerpoorig,cuerpocopia,idclass){
-
+ var numero = 0;
     cuerpoorig.forEach(cuerpoor => {
-     
+    
          if(cuerpoor.tipo===TIPO_INSTRUCCION.FUNCION){  
               cuerpocopia.forEach(cuerpocopi => {
                 if(cuerpocopi.tipo===TIPO_INSTRUCCION.FUNCION){ 
                      if(cuerpoor.id===cuerpocopi.id){
-                        Errores_1.Errores.add(new CNodoError.NodoError("copia","id en la metodo "+cuerpocopi.id+" coincide",0,0));
+                         var para = procesarPARAMETROS(cuerpoor.parametros,cuerpocopi.parametros);
+                         numero++;
+         Errores_1.Errores.add(new CNodoError.NodoError("copia","en la clase "+idclass+"</br>"+
+                        "id en la metodo "+cuerpocopi.id+" coincide </br>"+
+                        "parametros que coinciden ("+para+")",0,0));
 
                      }
                 }
                   
-                                               });
+                });
          }
    
 
@@ -108,4 +113,25 @@ function procesarVOID(cuerpoorig,cuerpocopia,idclass){
    
 
     });
+    return numero;
+}
+function procesarPARAMETROS(parameorig,paramecopia){
+    var nuemor = 0 ;
+    console.log("llego1");
+    parameorig.forEach(parameor => {
+        if (parameor.tipo===TIPO_INSTRUCCION.PARAMETRO){
+            console.log("llego2");
+            paramecopia.forEach(paramecopi=>{
+                if (paramecopi.tipo===TIPO_INSTRUCCION.PARAMETRO){
+                if (paramecopi.id===parameor.id && paramecopi.tipo_dato===parameor.tipo_dato ){
+                    console.log("llego3");
+                   nuemor ++;
+                }}
+            });
+
+        }
+
+
+    });
+   return nuemor;
 }
