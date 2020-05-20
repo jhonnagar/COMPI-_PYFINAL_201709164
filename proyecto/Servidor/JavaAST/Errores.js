@@ -28,29 +28,18 @@ var Errores = /** @class */ (function (_super) {
         return "Compilacion Sin Errores";
     };
     Errores.geterror = function () {
-        var cad = "";
-        cad += "<html>\n";
-        cad += "<header>\n";
-        cad += "<title>Reporte Errores</title>\n";
-        cad += "</header>\n";
-        cad += "<body background=\"gray\">\n";
-        cad += "<div align=\"center\">\n";
-        cad += "<h1>Reporte de Errores de Compilacion</h1>\n";
-        cad += "<table border=\"2\" align=\"center\">\n";
-        cad += "<tr>\n";
-        cad += "<th>TIPO DE ERROR</th><th>DESCRIPCION</th><th>LINEA</th>\n";
-        cad += "</tr>\n";
+        var cad = '';
+        cad += '<tr>\n';
+        cad += '<th>TIPO DE ERROR</th><th>DESCRIPCION</th><th>LINEA</th><th>COLUMNA</th>\n';
+        cad += '</tr>\n';
         for (var i = 0; i < this.prototype.length; i++) {
-            cad += "<tr>\n";
-            cad += "<td>" + this.prototype[i].gettipo() + "</td><td>" +
-                this.prototype[i].getdescripcion() + "</td><td>" +
-                this.prototype[i].getlinea() + "</td>\n";
-            cad += "</tr>\n";
-        }
-        cad += "</table>\n";
-        cad += "</div>\n";
-        cad += "</body>\n";
-        cad += "</html>\n";
+            cad += '<tr>\n';
+            cad += '<td>' + this.prototype[i].gettipo() + '</td><td>'+
+                this.prototype[i].getdescripcion() + '</td><td>' +
+                this.prototype[i].getlinea() + '</td><td>'+
+                this.prototype[i].getcolumna() + '</td>\n';
+            cad += '</tr>\n';
+           }
         return cad;
     };
     Errores.clear = function () {

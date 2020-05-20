@@ -7,13 +7,31 @@ function Conn(){
 
     $.post(url,{text:texto},function(data,status){
         if(status.toString()=="success"){
-
-           document.getElementById("resultado").value=data;
+   
+          rep = data;
 
         }else{
             alert("Error estado de conexion:"+status);
         }
     });
+}
+
+function Conn3(){
+
+  var texto = document.getElementById("operacion").value;
+  console.log(texto);
+
+  var url='http://localhost:8080/Calcular1/';
+
+  $.post(url,{text:texto},function(data,status){
+      if(status.toString()=="success"){
+       alert("siseenvia");
+        rep = data;
+
+      }else{
+          alert("Error estado de conexion:"+status);
+      }
+  });
 }
 function Conn1(){
 
@@ -38,8 +56,12 @@ var jstree= [
     { "text" : "Sin Cambios" },
   ]}
 ];
+var rep ="hola";
 function ast(){
   return jstree;
+}
+function reporte_errores(){
+  return rep;
 }
 
 

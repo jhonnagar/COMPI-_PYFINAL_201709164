@@ -5,10 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="../css/layout.css" rel="stylesheet" type="text/css" media="all">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
     <link rel="stylesheet" href="../dist/style.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="../dist/jstree.min.js"></script>
-    <script src="../js/nuevo2.js"></script>
+    <script src="../js/nuevo3.js"></script>
   </head>
   <body>
     <input type="button" onclick="llenarast()" value="llenarast"/> 
@@ -50,19 +50,32 @@ function resfreshJSTree() {
      } 
  
     </script> 
-
+    
     <div class="wrapper row3">
       <main class="container clear">
         <div class="group" id="div">
 
-          <textarea id="operacion" rows="20" cols="100"></textarea>  <textarea id="resultado" rows="20" cols="50"></textarea>
+          <textarea id="operacion" rows="30" cols="125"></textarea> 
           <button onclick="Conn()">Calcular</button>
-          
-
+          <button onclick="Conn3()">Comparar</button>
+          <table id ="cuerpot">
+           
+          </table>
+          <button onclick="errores()">mostrarerrores</button>
+          <a href ="http://localhost:8000/otrapagina" target="_blank">Nueva pestaña</a> 
+          <script> function errores(){
+            var temp =  reporte_errores();
+            alert (temp) ;
+            $("#cuerpot").empty();
+            $("#cuerpot").append(temp);
+          }
+          </script>
         </div>
         <div class="clear"></div>
       </main>
     </div>
+
+    
 
     <script src="../js/jquery.backtotop.js"></script>
     <script src="../js/jquery.mobilemenu.js"></script>

@@ -4,6 +4,8 @@
 	const TIPO_OPERACION	= require('./instrucciones').TIPO_OPERACION;
 	const TIPO_VALOR 		= require('./instrucciones').TIPO_VALOR;
 	const instruccionesAPI	= require('./instrucciones').instruccionesAPI;
+        let CErrores=require('../JavaAST/Errores');
+        let CNodoError=require('../JavaAST/NodoError');
 %}
 
 
@@ -82,8 +84,7 @@
 
 
 <<EOF>>				return 'EOF';
-.					{ console.error('Este es un error léxico: ' + yytext + ', en la linea: ' + yylloc.first_line + ', en la columna: ' + yylloc.first_column); }
-
+.	 CErrores.Errores.add(new CNodoError.NodoError("Lexico","No se esperaba el caracter: "+yytext,yylineno,yylloc.first_column))
 /lex
 
 /*--------------------------------------------------SINTACTICO-----------------------------------------------*/
