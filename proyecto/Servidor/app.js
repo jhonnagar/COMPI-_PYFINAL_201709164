@@ -96,10 +96,13 @@ function procesarVOID(cuerpoorig,cuerpocopia,idclass){
               cuerpocopia.forEach(cuerpocopi => {
                 if(cuerpocopi.tipo===TIPO_INSTRUCCION.FUNCION){ 
                      if(cuerpoor.id===cuerpocopi.id){
+                         if (cuerpoor.parametros!="" && cuerpocopi.parametros!=""){
                          var para = procesarPARAMETROS(cuerpoor.parametros,cuerpocopi.parametros);
+                         }
+                         var varia = procesarVariables(cuerpoor.cuerpo,cuerpocopi.cuerpo,cuerpocopi.id,idclass);
                          numero++;
          Errores_1.Errores.add(new CNodoError.NodoError("copia","en la clase "+idclass+"</br>"+
-                        "id en la metodo "+cuerpocopi.id+" coincide </br>"+
+                        "id en el metodo "+cuerpocopi.id+" coincide </br>"+
                         "parametros que coinciden ("+para+")",0,0));
 
                      }
@@ -117,14 +120,14 @@ function procesarVOID(cuerpoorig,cuerpocopia,idclass){
 }
 function procesarPARAMETROS(parameorig,paramecopia){
     var nuemor = 0 ;
-    console.log("llego1");
+   
     parameorig.forEach(parameor => {
         if (parameor.tipo===TIPO_INSTRUCCION.PARAMETRO){
-            console.log("llego2");
+         
             paramecopia.forEach(paramecopi=>{
                 if (paramecopi.tipo===TIPO_INSTRUCCION.PARAMETRO){
                 if (paramecopi.id===parameor.id && paramecopi.tipo_dato===parameor.tipo_dato ){
-                    console.log("llego3");
+                    
                    nuemor ++;
                 }}
             });
@@ -134,4 +137,44 @@ function procesarPARAMETROS(parameorig,paramecopia){
 
     });
    return nuemor;
+}
+
+function procesarVariables(cuerpoorig,cuerpocopia,idvoid,idclass){
+    procesardeclaracion(cuerpoorig,cuerpocopia,idvoid,idclass);
+
+}
+function procesardeclaracion(cuerpoorig,cuerpocopia,idvoid,idclass){
+
+
+    cuerpoorig.forEach(cuerpoor => {
+    
+        if(cuerpoor.tipo===TIPO_INSTRUCCION.DECLARACION){  
+             cuerpocopia.forEach(cuerpocopi => {
+               if(cuerpocopi.tipo===TIPO_INSTRUCCION.DECLARACION){ 
+                    if( cuerpoor.tipo_dato===cuerpocopi.tipo_dato){
+                        cuerpoor.id.forEach(idor =>{
+                            cuerpocopi.id.forEach(idcopi =>{
+                                if (idor.id === idcopi.id){
+                                      Errores_1.Errores.add(new CNodoError.NodoError("copia","en la clase "+idclass+"</br>"+
+                                       "en el metodo "+idvoid+"</br>"+
+                                        "id en la variable "+idor.id+" coincide </br>",0,0));
+                                }
+
+                            
+                            });
+
+                        });
+                      
+
+                    }
+               }
+                 
+               });
+        }
+  
+
+      
+  
+
+   });
 }

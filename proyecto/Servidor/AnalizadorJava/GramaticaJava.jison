@@ -112,6 +112,8 @@ instrucciones
 instruccion
     : tclass id llavea cuerpo llavec{$$=instruccionesAPI.class($2,$4);}
     | timport id puntocoma {$$=instruccionesAPI.import($2);}
+    | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
+
     ;
 
 cuerpo: cuerpo cuerpoc { $1.push($2); $$ = $1; }
@@ -121,7 +123,8 @@ cuerpo: cuerpo cuerpoc { $1.push($2); $$ = $1; }
 cuerpoc: tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
         | id valores {$$=instruccionesAPI.variable($1,$2);}
         | tvoid id para parametro parc llavea cuerpovoid llavec { $$= instruccionesAPI.funcionvoid($2,$4,$7);}
-       ;
+          | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
+ ;
 funcion:  parametro parc llavea cuerpovoid llavec { $$= instruccionesAPI.funcion($1,$4);};
 
 parametro: parametro coma parametrox{ $1.push($3) ; $$=$1;}
@@ -129,6 +132,7 @@ parametro: parametro coma parametrox{ $1.push($3) ; $$=$1;}
           | {$$="";}
         ;
 parametrox: tipoDato id {$$=instruccionesAPI.parametro($1,$2); }
+          | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
 ;
 cuerpovoid: cuerpovoid cuerpovoidx {$1.push($2);$$=$1;}
           | cuerpovoidx {$$=[$1];}
@@ -147,12 +151,15 @@ cuerpovoidx: tif para condicion parc llavea cuerpovoid llavec elses { $$=instruc
             | tcontinue puntocoma {$$=instruccionesAPI.nuevocontinue();}
             | tbreak  puntocoma {$$=instruccionesAPI.nuevobreak();}
             | treturn treturnc {$$=instruccionesAPI.nuevoreturn($2);}
-            ;
+               | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
+ ;
 casos: casos nuevocaso{$1.push($2);$$=$1;} 
        | nuevocaso {$$=[$1];}
        ;
 nuevocaso: tcase EXP dospuntos cuerpocase tbreak puntocoma {$$=instruccionesAPI.nuevocase($2,$4);}
         | tdefault  dospuntos cuerpocase tbreak puntocoma {$$=instruccionesAPI.nuevodefcase($3);}
+            | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
+
         ;
 cuerpocase: cuerpocase cuerpocasex {$1.push($2);$$=$1;}
           | cuerpocasex {$$=[$1];}
@@ -168,21 +175,27 @@ cuerpocasex: tif para condicion parc llavea cuerpovoid llavec elses { $$=instruc
             | tprintln para EXP parc puntocoma { $$= instruccionesAPI.nuevoprintln ($3);} 
             | tcontinue puntocoma {$$=instruccionesAPI.nuevocontinue();}
             | treturn treturnc {$$=instruccionesAPI.nuevoreturn($2);}
-            ;
+            | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
+ ;
 treturnc: EXP puntocoma{$$=$1;}
         |puntocoma{$$="";}
         ;
 cambioid:taumen{$$=$1}
-         |tdecren{$$=$1};
+         |tdecren{$$=$1}
+         ;
             
 idfor:  tipoDato ids valores {$$=instruccionesAPI.declaracion($1,$2,$3);}
         | id valores {$$=instruccionesAPI.variable($1,$2);}
+        | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
+
         ;
 elses: telse tipodeelse{ $$=$2;}
        |{$$="";}
        ;
 tipodeelse:llavea cuerpovoid llavec {$$= instruccionesAPI.nuevoelse($2);}
         |  tif para condicion parc llavea cuerpovoid llavec elses { $$=instruccionesAPI.nuevoif($3,$6,$8); }
+            | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
+
 ;
 
 /*------------------------------------------------COMPONER condicion -----------------------------------------------*/
@@ -198,17 +211,22 @@ condicion:condicion tmayor condicion {  $$ = instruccionesAPI.nuevoOperacionBina
          |tnot condicion {   $$=instruccionesAPI.nuevonot($2);}
          |EXP {$$=$1;}
          | para condicion parc{$$=$2;}
+             | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
+
         ;
 tipoDato:tint {$$=$1;}
  |tstring{$$=$1;}
  |tboolean{$$=$1;}
  |tdouble{$$=$1;}
  |tchar {$$=$1;} 
+ 
  ;
 ids: ids coma idr { $1.push($3) ; $$=$1;}
    | idr  {$$=[$1];}
  ;
 idr: id {$$=instruccionesAPI.nuevoid($$=$1);}
+    | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
+
  ;
 /*------------------------------------------------COMPONER LO VALORES -----------------------------------------------*/
 valores: puntocoma{$$=" ";}
@@ -216,6 +234,7 @@ valores: puntocoma{$$=" ";}
        | para funcion {$$=$2;}
        | taumen puntocoma {$$=1}
        | tdecren puntocoma {$$=1}
+
        ;
 EXP: para EXP parc   {  $$=$2; }
     |tresta entero %prec UTresta  {  $$ = instruccionesAPI.nuevoValor(Number($2), TIPO_VALOR.NUMERONEG);  }	
@@ -233,6 +252,7 @@ EXP: para EXP parc   {  $$=$2; }
     |ttrue    {  $$ = instruccionesAPI.nuevoValor($1, TIPO_VALOR.BOOL);  }
     |tfalse  {  $$ = instruccionesAPI.nuevoValor($1, TIPO_VALOR.BOOL);  }
     |id para idx parc {  $$ = instruccionesAPI.nuevalorfunc($1,$3);  }
+    
     ;
 
 idx: idex {$$=$1}
@@ -242,5 +262,6 @@ idex: idex coma idxr { $1.push($3) ; $$=$1;}
 | idxr  {$$=[$1];}
 ;
 idxr: condicion {$$=instruccionesAPI.nuevoid($1);}
+
     
 ;
