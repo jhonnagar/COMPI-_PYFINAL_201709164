@@ -74,8 +74,10 @@ function procesarCLASS(resultado){
         if (instruccion.tipo === TIPO_INSTRUCCION.CLASS) {
             if (resultado.id===instruccion.id){
                 var canti=  procesarVOID(resultado.cuerpo,instruccion.cuerpo,resultado.id);
-                Errores_1.Errores.add(new CNodoError.NodoError("copia","id en la clase "+resultado.id+" coincide </br>"+
-                "metodos que coinciden ("+canti+")",0,0));
+                var canti2 =procesarFUNCIONES(resultado.cuerpo,instruccion.cuerpo,resultado.id);
+                Errores_1.Errores.add(new CNodoError.NodoError("copia de clase","id en la clase "+resultado.id+" coincide </br>"+
+                "metodos que coinciden ("+canti+")</br>"+
+                "funciones que coinciden ("+canti2+")",0,0));
             }
         } });
 
@@ -101,9 +103,10 @@ function procesarVOID(cuerpoorig,cuerpocopia,idclass){
                          }
                          var varia = procesarVariables(cuerpoor.cuerpo,cuerpocopi.cuerpo,cuerpocopi.id,idclass);
                          numero++;
-         Errores_1.Errores.add(new CNodoError.NodoError("copia","en la clase "+idclass+"</br>"+
+         Errores_1.Errores.add(new CNodoError.NodoError("copia de metodo","en la clase "+idclass+"</br>"+
                         "id en el metodo "+cuerpocopi.id+" coincide </br>"+
-                        "parametros que coinciden ("+para+")",0,0));
+                        "parametros que coinciden ("+para+")</br>"+
+                        "variables que coinciden ("+varia+")",0,0));
 
                      }
                 }
@@ -140,12 +143,13 @@ function procesarPARAMETROS(parameorig,paramecopia){
 }
 
 function procesarVariables(cuerpoorig,cuerpocopia,idvoid,idclass){
-    procesardeclaracion(cuerpoorig,cuerpocopia,idvoid,idclass);
-
+    var numero = 0;
+    numero += procesardeclaracion(cuerpoorig,cuerpocopia,idvoid,idclass);
+  return numero;
 }
 function procesardeclaracion(cuerpoorig,cuerpocopia,idvoid,idclass){
 
-
+ var numero =0 ;
     cuerpoorig.forEach(cuerpoor => {
     
         if(cuerpoor.tipo===TIPO_INSTRUCCION.DECLARACION){  
@@ -155,9 +159,10 @@ function procesardeclaracion(cuerpoorig,cuerpocopia,idvoid,idclass){
                         cuerpoor.id.forEach(idor =>{
                             cuerpocopi.id.forEach(idcopi =>{
                                 if (idor.id === idcopi.id){
-                                      Errores_1.Errores.add(new CNodoError.NodoError("copia","en la clase "+idclass+"</br>"+
+                                      Errores_1.Errores.add(new CNodoError.NodoError("copia de variable","en la clase "+idclass+"</br>"+
                                        "en el metodo "+idvoid+"</br>"+
                                         "id en la variable "+idor.id+" coincide </br>",0,0));
+                                        numero ++;
                                 }
 
                             
@@ -177,4 +182,61 @@ function procesardeclaracion(cuerpoorig,cuerpocopia,idvoid,idclass){
   
 
    });
+   return numero;
+}
+function procesarFUNCIONES(cuerpoorig,cuerpocopia,idclass){
+    var numero = 0;
+    cuerpoorig.forEach(cuerpoor => {
+    
+        if(cuerpoor.tipo===TIPO_INSTRUCCION.DECLARACION){  
+             cuerpocopia.forEach(cuerpocopi => {
+               if(cuerpocopi.tipo===TIPO_INSTRUCCION.DECLARACION){ 
+                    if( cuerpoor.tipo_dato===cuerpocopi.tipo_dato){
+                        cuerpoor.id.forEach(idor =>{
+                            cuerpocopi.id.forEach(idcopi =>{
+                                if (idor.id === idcopi.id){
+                                   if (cuerpoor.valor.tipo === TIPO_INSTRUCCION.FUNCION && cuerpocopi.valor.tipo === TIPO_INSTRUCCION.FUNCION) {
+                                    console.log("esta 1 con el id  "+idor.id);
+                                    
+                                    if (cuerpoor.valor.parametros!="" && cuerpocopi.valor.parametros!=""){
+                                        console.log("esta qui");
+                                        var para = procesarPARAMETROS(cuerpoor.valor.parametros,cuerpocopi.valor.parametros);
+                                        }
+                                        console.log("esta qui 2 ");
+                                        var varia = procesarVariables(cuerpoor.valor.cuerpo,cuerpocopi.valor.cuerpo,idcopi.id,idclass);
+                                        numero++;
+                                        Errores_1.Errores.add(new CNodoError.NodoError("copia de funcion","en la clase "+idclass+"</br>"+
+                                       "id en la funcion "+idcopi.id+" coincide </br>"+
+                                       "parametros que coinciden ("+para+")</br>"+
+                                       "variables que coinciden ("+varia+")",0,0));
+               
+                                    
+
+                                   }
+                                 
+
+
+
+
+
+                                }
+
+                            
+                            });
+
+                        });
+                      
+
+                    }
+               }
+                 
+               });
+        }
+  
+
+      
+  
+
+   });
+return numero;
 }

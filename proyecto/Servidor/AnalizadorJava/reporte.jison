@@ -109,6 +109,7 @@ instrucciones
 instruccion
     : tclass id llavea cuerpo llavec {$$={text: 'class '+$2,children: $4};}
     | timport id puntocoma {$$={text: 'import', children: [{text: $2 }]};}
+    | error { $$=""; }
     ;
 
 cuerpo: cuerpo cuerpoc { $1.push($2); $$ = $1; }
@@ -118,6 +119,7 @@ cuerpo: cuerpo cuerpoc { $1.push($2); $$ = $1; }
 cuerpoc: tipoDato ids valores  {$$={text:'declaracion '+$1,children:[{text:'ids',children:$2},{text:'valores',children:$3}]};}
        | id valores {$$={text:'valor '+$1,children:$2};} 
        | tvoid id para parametro parc llavea cuerpovoid llavec { $$={text:'void '+$2,children:[{text:'parametro',children:$4},{text:'cuerpo',children:$7}]};}
+       | error { $$=""; }
        ;
 funcion:  parametro parc llavea cuerpovoid llavec { $$= [{text:'funcion'},{text:'parametro',children:$1},{text:'cuerpo',children:$4}];};
 
@@ -126,7 +128,8 @@ parametro: parametro coma parametrox{ $1.push($3) ; $$=$1;}
           | {$$="";}
         ;
 parametrox: tipoDato id {$$={text:$1,children:[{text:$2}]}; }
- ;
+  | error { $$=""; }
+       ;
 cuerpovoid: cuerpovoid cuerpovoidx {$1.push($2);$$=$1;}
           | cuerpovoidx {$$=[$1];}
  ;
@@ -144,13 +147,15 @@ cuerpovoidx: tif para condicion parc llavea cuerpovoid llavec elses { $$={text:'
             | tcontinue puntocoma {$$={text:'continue'};}
             | tbreak  puntocoma {$$={text:'break'};}
             | treturn treturnc {$$={text:'return',children:$2}}
-            ;
+             | error { $$=""; }
+       ;
 casos: casos nuevocaso{$1.push($2);$$=$1;} 
        | nuevocaso {$$=[$1];}
        ;
 nuevocaso: tcase EXP dospuntos cuerpocase tbreak puntocoma {$$={text:'case',children:[{text:'valor',children:$2},{text:'cuerpo',children:$4}]};}
         | tdefault  dospuntos cuerpocase tbreak puntocoma {$$={text:'default',children:$3};}
-        ;
+         | error { $$=""; }
+       ;
 cuerpocase: cuerpocase cuerpocasex {$1.push($2);$$=$1;}
           | cuerpocasex {$$=[$1];}
  ;
@@ -166,7 +171,8 @@ cuerpocasex:  tif para condicion parc llavea cuerpovoid llavec elses { $$={text:
             | tprintln para EXP parc puntocoma { $$= {text:'print',children:$3};} 
             | tcontinue puntocoma {$$={text:'continue'};}
             | treturn treturnc {$$={text:'return',children:$2}}
-            ;
+             | error { $$=""; }
+       ;
 treturnc: EXP puntocoma{$$=$1;}
         |puntocoma{$$="";}
         ;
@@ -175,13 +181,15 @@ cambioid:taumen{$$=$1}
             
 idfor:tipoDato id valores  {$$={text:'declaracion '+$1,children:[{text:'id'+$2},{text:'valor',children:$3}]};}
       | id valores {$$={text:'valor '+$1,children:$2};}
-        ;
+         | error { $$=""; }
+       ;
 elses: telse tipodeelse{ $$=$2;}
        |{$$="";}
        ;
 tipodeelse:llavea cuerpovoid llavec {$$=$2;}
         |  tif para condicion parc llavea cuerpovoid llavec elses { $$=[{text:'IF',children:[{text:' condicion',children:$3},{text:'cuerpo',children:$6},{text:'else',children:$8}]}]; }
-;
+ | error { $$=""; }
+       ;
 
 /*------------------------------------------------COMPONER condicion -----------------------------------------------*/
 
@@ -196,7 +204,8 @@ condicion:condicion tmayor condicion    {  $$ = [{text:'izq',children:$1},{text:
          |tnot condicion {   $$=[{text:'not',children:$2}];}
          |EXP {$$=$1;}
          | para condicion parc{$$=$2;}
-        ;
+         | error { $$=""; }
+       ;
 tipoDato:tint {$$=$1;}
  |tstring{$$=$1;}
  |tboolean{$$=$1;}
@@ -207,7 +216,8 @@ ids: ids coma idr { $1.push($3) ; $$=$1;}
    | idr  {$$=[$1];}
  ;
 idr: id {$$={text:$1}}
- ;
+  | error { $$=""; }
+       ;
 /*------------------------------------------------COMPONER LO VALORES -----------------------------------------------*/
 valores: puntocoma{$$=" ";}
        | tigual EXP puntocoma{$$=$2;} 
