@@ -213,7 +213,7 @@ const instruccionesAPI = {
 	nuevocase: function(exprecion,cuerpo) {
 		return {
 			tipo: TIPO_INSTRUCCION.CASE,
-		  exprecion :exprecion,
+		    exprecion :exprecion,
 			cuerpo:cuerpo
 			
 			

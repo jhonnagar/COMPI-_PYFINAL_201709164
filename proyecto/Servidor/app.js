@@ -181,11 +181,47 @@ function procesarVariables(cuerpoorig,cuerpocopia,idvoid,idclass){
        }
    });
 }
+if(cuerpoor.tipo===TIPO_INSTRUCCION.SWITCH){  
+    cuerpocopia.forEach(cuerpocopi => {
+      if(cuerpocopi.tipo===TIPO_INSTRUCCION.SWITCH){  
+           numero += procesarCHUIS(cuerpoor.listacase,cuerpocopi.listacase,idvoid,idclass); 
+      
+       }
+   });
+}
 
 
 
     });
   return numero;
+}
+function procesarCHUIS(cuerpoorig,cuerpocopia,idvoid,idclass){
+     var numero =0;
+ cuerpoorig.forEach(cuerpoor=>{
+        if (cuerpoor.tipo=== TIPO_INSTRUCCION.CASE){
+            cuerpocopia.forEach(cuerpocopi=>{
+                if (cuerpocopi.tipo=== TIPO_INSTRUCCION.CASE){
+                    if (JSON.stringify(cuerpoor.exprecion, null, 2)=== JSON.stringify(cuerpocopi.exprecion, null, 2)){
+                        numero += procesarVariables(cuerpoor.cuerpo,cuerpocopi.cuerpo,idvoid,idclass); 
+                    }
+                }
+            });
+        }
+        if (cuerpoor.tipo=== TIPO_INSTRUCCION.DEF_CASE){
+            cuerpocopia.forEach(cuerpocopi=>{
+                if (cuerpocopi.tipo=== TIPO_INSTRUCCION.DEF_CASE){
+                    
+                        numero += procesarVariables(cuerpoor.cuerpo,cuerpocopi.cuerpo,idvoid,idclass); 
+                    
+                }
+            });
+        }
+
+
+
+
+ });
+ return numero;
 }
 function procesarelse( cuerpoorig,cuerpocopia,idvoid,idclass){
      var numero = 0
@@ -257,7 +293,7 @@ function procesarFUNCIONES(cuerpoorig,cuerpocopia,idclass){
                                         var retun= procesaretun(cuerpoor.valor.cuerpo,cuerpocopi.valor.cuerpo);
                                         numero++;
                                         Errores_1.Errores.add(new CNodoError.NodoError("copia de funcion","en la clase "+idclass+"</br>"+
-                                       "id en la funcion "+idcopi.id+" coincide </br>"+
+                                        JSON.stringify(cuerpoor.tipo_dato, null, 2)+" id en la funcion "+idcopi.id+" coincide </br>"+
                                        "parametros que coinciden ("+para+")</br>"+
                                        "return que coinciden ("+retun+")</br>"+
                                        "variables que coinciden ("+varia+")",0,0));
@@ -361,6 +397,15 @@ function procesaretun(cuerpoorig,cuerpocopia){
    });
 }
 
+if(cuerpoor.tipo===TIPO_INSTRUCCION.SWITCH){  
+    cuerpocopia.forEach(cuerpocopi => {
+      if(cuerpocopi.tipo===TIPO_INSTRUCCION.SWITCH){  
+        numero += procesarCHUISr(cuerpoor.listacase,cuerpocopi.listacase); 
+      
+       }
+   });
+}
+
 
 
     });
@@ -379,5 +424,34 @@ function procesarelseretun( cuerpoorig,cuerpocopia,idvoid,idclass){
        numero += procesaretun(cuerpoorig.cuerpo,cuerpocopia.cuerpo,idvoid,idclass); 
        
    }
+return numero;
+}
+
+function procesarCHUISr(cuerpoorig,cuerpocopia){
+    var numero =0;
+cuerpoorig.forEach(cuerpoor=>{
+       if (cuerpoor.tipo=== TIPO_INSTRUCCION.CASE){
+           cuerpocopia.forEach(cuerpocopi=>{
+               if (cuerpocopi.tipo=== TIPO_INSTRUCCION.CASE){
+                   if (JSON.stringify(cuerpoor.exprecion, null, 2)=== JSON.stringify(cuerpocopi.exprecion, null, 2)){
+                       numero += procesarRETURN(cuerpoor.cuerpo,cuerpocopi.cuerpo); 
+                   }
+               }
+           });
+       }
+       if (cuerpoor.tipo=== TIPO_INSTRUCCION.DEF_CASE){
+           cuerpocopia.forEach(cuerpocopi=>{
+               if (cuerpocopi.tipo=== TIPO_INSTRUCCION.DEF_CASE){
+                   
+                       numero += procesarRETURN(cuerpoor.cuerpo,cuerpocopi.cuerpo); 
+                   
+               }
+           });
+       }
+
+
+
+
+});
 return numero;
 }

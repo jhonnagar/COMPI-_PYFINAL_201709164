@@ -71,16 +71,20 @@ function resfreshJSTree() {
     <div class="wrapper row3">
       <main class="container clear">
         <div class="group" id="div">
-          <input type="file" id="archivo"><button onclick="guardararchivo()">GUARDAR</button><button onclick="reporte()">reporte</button>
+
+          <table><tr><td> <input type="file" id="archivo"></td>
+          <td><button onclick="guardararchivo()">GUARDAR</button></td></tr></table>
 
           <textarea id="operacion" rows="30" cols="125"></textarea> 
-          <button onclick="Conn()">Calcular</button>
-          <button onclick="Conn3()">Comparar</button>
+          <table><tr><td>  <button onclick="Conn()">Calcular</button></td>
+          <td>   <button onclick="Conn3()">Comparar</button> </td>
+        <td><button onclick="errores()">mostrarerrores</button></td>
+      <td>  <a href ="http://localhost:8000/otrapagina" target="_blank">Nueva pestaña</a> </td></tr></table>
+        
           <table id ="cuerpot">
            
           </table>
-          <button onclick="errores()">mostrarerrores</button>
-          <a href ="http://localhost:8000/otrapagina" target="_blank">Nueva pestaña</a> 
+        
           <script> function errores(){
             var temp =  reporte_errores();
             alert (temp) ;
