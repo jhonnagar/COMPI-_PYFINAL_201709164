@@ -20,8 +20,6 @@ app.post('/Calcular/', function (req, res) {
     var entrada = req.body.text;
     var resultado = parser(entrada)
     resultadox=resultado;
-    Errores_1.Errores.add(new CNodoError.NodoError("sintactica","No se esperaba el caracter: ",0,0));
-    Errores_1.Errores.add(new CNodoError.NodoError("pedos ","No se esperaba el caracter: ",0,0));
 
     var rerror = Errores_1.Errores.geterror();
     
@@ -145,7 +143,62 @@ function procesarPARAMETROS(parameorig,paramecopia){
 function procesarVariables(cuerpoorig,cuerpocopia,idvoid,idclass){
     var numero = 0;
     numero += procesardeclaracion(cuerpoorig,cuerpocopia,idvoid,idclass);
+    cuerpoorig.forEach(cuerpoor => {
+    
+        if(cuerpoor.tipo===TIPO_INSTRUCCION.IF){  
+             cuerpocopia.forEach(cuerpocopi => {
+               if(cuerpocopi.tipo===TIPO_INSTRUCCION.IF){  
+                    
+                    numero += procesarVariables(cuerpoor.cuerpo,cuerpocopi.cuerpo,idvoid,idclass); 
+                    if (cuerpoor.else!="" && cuerpocopi.else!="" ){
+                    numero += procesarelse(cuerpoor.else,cuerpocopi.else,idvoid,idclass);
+                }
+                }
+            });
+        }
+
+        if(cuerpoor.tipo===TIPO_INSTRUCCION.WHILE){  
+            cuerpocopia.forEach(cuerpocopi => {
+              if(cuerpocopi.tipo===TIPO_INSTRUCCION.WHILE){  
+                   numero += procesarVariables(cuerpoor.cuerpo,cuerpocopi.cuerpo,idvoid,idclass); 
+              
+               }
+           });
+       }
+       if(cuerpoor.tipo===TIPO_INSTRUCCION.FOR){  
+        cuerpocopia.forEach(cuerpocopi => {
+          if(cuerpocopi.tipo===TIPO_INSTRUCCION.FOR){  
+               numero += procesarVariables(cuerpoor.cuerpo,cuerpocopi.cuerpo,idvoid,idclass); 
+          
+           }
+       });
+   }
+   if(cuerpoor.tipo===TIPO_INSTRUCCION.DO_WHILE){  
+    cuerpocopia.forEach(cuerpocopi => {
+      if(cuerpocopi.tipo===TIPO_INSTRUCCION.DO_WHILE){  
+           numero += procesarVariables(cuerpoor.cuerpo,cuerpocopi.cuerpo,idvoid,idclass); 
+      
+       }
+   });
+}
+
+
+
+    });
   return numero;
+}
+function procesarelse( cuerpoorig,cuerpocopia,idvoid,idclass){
+     var numero = 0
+    if(cuerpoorig.tipo===TIPO_INSTRUCCION.IF && cuerpocopia.tipo===TIPO_INSTRUCCION.IF){  
+        numero += procesarVariables(cuerpoorig.cuerpo,cuerpocopia.cuerpo,idvoid,idclass); 
+        if (cuerpoorig.else!="" && cuerpocopia.else!="" ){
+        numero += procesarelse(cuerpoorig.else,cuerpocopia.else,idvoid,idclass);
+    }
+    }else{
+        numero += procesarVariables(cuerpoorig.cuerpo,cuerpocopia.cuerpo,idvoid,idclass); 
+        
+    }
+return numero;
 }
 function procesardeclaracion(cuerpoorig,cuerpocopia,idvoid,idclass){
 
@@ -161,7 +214,7 @@ function procesardeclaracion(cuerpoorig,cuerpocopia,idvoid,idclass){
                                 if (idor.id === idcopi.id){
                                       Errores_1.Errores.add(new CNodoError.NodoError("copia de variable","en la clase "+idclass+"</br>"+
                                        "en el metodo "+idvoid+"</br>"+
-                                        "id en la variable "+idor.id+" coincide </br>",0,0));
+                                       JSON.stringify(cuerpoor.tipo_dato, null, 2)+ " id en la variable "+idor.id+" coincide </br>",0,0));
                                         numero ++;
                                 }
 
@@ -196,18 +249,17 @@ function procesarFUNCIONES(cuerpoorig,cuerpocopia,idclass){
                             cuerpocopi.id.forEach(idcopi =>{
                                 if (idor.id === idcopi.id){
                                    if (cuerpoor.valor.tipo === TIPO_INSTRUCCION.FUNCION && cuerpocopi.valor.tipo === TIPO_INSTRUCCION.FUNCION) {
-                                    console.log("esta 1 con el id  "+idor.id);
-                                    
+                                       var para=0
                                     if (cuerpoor.valor.parametros!="" && cuerpocopi.valor.parametros!=""){
-                                        console.log("esta qui");
-                                        var para = procesarPARAMETROS(cuerpoor.valor.parametros,cuerpocopi.valor.parametros);
+                                         para = procesarPARAMETROS(cuerpoor.valor.parametros,cuerpocopi.valor.parametros);
                                         }
-                                        console.log("esta qui 2 ");
                                         var varia = procesarVariables(cuerpoor.valor.cuerpo,cuerpocopi.valor.cuerpo,idcopi.id,idclass);
+                                        var retun= procesaretun(cuerpoor.valor.cuerpo,cuerpocopi.valor.cuerpo);
                                         numero++;
                                         Errores_1.Errores.add(new CNodoError.NodoError("copia de funcion","en la clase "+idclass+"</br>"+
                                        "id en la funcion "+idcopi.id+" coincide </br>"+
                                        "parametros que coinciden ("+para+")</br>"+
+                                       "return que coinciden ("+retun+")</br>"+
                                        "variables que coinciden ("+varia+")",0,0));
                
                                     
@@ -238,5 +290,94 @@ function procesarFUNCIONES(cuerpoorig,cuerpocopia,idclass){
   
 
    });
+return numero;
+}
+function procesarRETURN(cuerpoorig,cuerpocopia){
+
+    var numero =0 ;
+       cuerpoorig.forEach(cuerpoor => {
+       
+           if(cuerpoor.tipo===TIPO_INSTRUCCION.RETURN){  
+                cuerpocopia.forEach(cuerpocopi => {
+                  if(cuerpocopi.tipo===TIPO_INSTRUCCION.RETURN){ 
+                            if (JSON.stringify(cuerpoor.valor, null, 2)=== JSON.stringify(cuerpocopi.valor, null, 2)){   
+                                           numero ++;
+                                   }}
+   
+                               
+                       
+                  
+
+                  });
+           }
+     
+   
+         
+     
+   
+      });
+      return numero;
+   }
+function procesaretun(cuerpoorig,cuerpocopia){
+
+    var numero = 0;
+    numero += procesarRETURN(cuerpoorig,cuerpocopia);
+    cuerpoorig.forEach(cuerpoor => {
+    
+        if(cuerpoor.tipo===TIPO_INSTRUCCION.IF){  
+             cuerpocopia.forEach(cuerpocopi => {
+               if(cuerpocopi.tipo===TIPO_INSTRUCCION.IF){  
+                    
+                    numero += procesaretun(cuerpoor.cuerpo,cuerpocopi.cuerpo); 
+                    if (cuerpoor.else!="" && cuerpocopi.else!="" ){
+                    numero += procesarelseretun(cuerpoor.else,cuerpocopi.else);
+                }
+                }
+            });
+        }
+
+        if(cuerpoor.tipo===TIPO_INSTRUCCION.WHILE){  
+            cuerpocopia.forEach(cuerpocopi => {
+              if(cuerpocopi.tipo===TIPO_INSTRUCCION.WHILE){  
+                   numero += procesaretun(cuerpoor.cuerpo,cuerpocopi.cuerpo); 
+              
+               }
+           });
+       }
+       if(cuerpoor.tipo===TIPO_INSTRUCCION.FOR){  
+        cuerpocopia.forEach(cuerpocopi => {
+          if(cuerpocopi.tipo===TIPO_INSTRUCCION.FOR){  
+            numero += procesaretun(cuerpoor.cuerpo,cuerpocopi.cuerpo); 
+          
+           }
+       });
+   }
+   if(cuerpoor.tipo===TIPO_INSTRUCCION.DO_WHILE){  
+    cuerpocopia.forEach(cuerpocopi => {
+      if(cuerpocopi.tipo===TIPO_INSTRUCCION.DO_WHILE){  
+        numero += procesaretun(cuerpoor.cuerpo,cuerpocopi.cuerpo); 
+      
+       }
+   });
+}
+
+
+
+    });
+  return numero;
+    
+}
+
+function procesarelseretun( cuerpoorig,cuerpocopia,idvoid,idclass){
+    var numero = 0
+   if(cuerpoorig.tipo===TIPO_INSTRUCCION.IF && cuerpocopia.tipo===TIPO_INSTRUCCION.IF){  
+       numero += procesaretun(cuerpoorig.cuerpo,cuerpocopia.cuerpo); 
+       if (cuerpoorig.else!="" && cuerpocopia.else!="" ){
+       numero += procesarelseretun(cuerpoorig.else,cuerpocopia.else,idvoid,idclass);
+   }
+   }else{
+       numero += procesaretun(cuerpoorig.cuerpo,cuerpocopia.cuerpo,idvoid,idclass); 
+       
+   }
 return numero;
 }

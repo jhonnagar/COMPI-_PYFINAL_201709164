@@ -5,8 +5,11 @@ const TIPO_VALOR = {
 	NUMERONEG:         'VAlOR_NUMERO_NEGATIVO',
 	ID:             'VALOR_ID',
 	CADENA:         'VALOR_CADENA',
+	INT:            'INT',
+	STRING:         'STRNIG',
 	CHAR: 			'CHAR',
-	BOOL:           'BOOL',
+	BOOL:           'BOOLEAN',
+	DOUBLE:         'DOUBLE',
 	MASMAS:         'MASMAS',
 	MENOSMENOS:     'MENOSMENOS'
 }

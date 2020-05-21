@@ -9,6 +9,23 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="../dist/jstree.min.js"></script>
     <script src="../js/nuevo3.js"></script>
+    <script>
+      window.addEventListener('load', inicio, false);
+  
+      function inicio() {
+          document.getElementById('archivo').addEventListener('change', cargar, false);               
+      }
+  
+      function cargar(ev) {
+          var arch=new FileReader();
+          arch.addEventListener('load',leer,false);
+          arch.readAsText(ev.target.files[0]);
+      }
+      
+      function leer(ev) {
+          document.getElementById('operacion').value=ev.target.result;
+      }
+  </script>
   </head>
   <body>
     <input type="button" onclick="llenarast()" value="llenarast"/> 
@@ -54,6 +71,7 @@ function resfreshJSTree() {
     <div class="wrapper row3">
       <main class="container clear">
         <div class="group" id="div">
+          <input type="file" id="archivo"><button onclick="guardararchivo()">GUARDAR</button><button onclick="reporte()">reporte</button>
 
           <textarea id="operacion" rows="30" cols="125"></textarea> 
           <button onclick="Conn()">Calcular</button>

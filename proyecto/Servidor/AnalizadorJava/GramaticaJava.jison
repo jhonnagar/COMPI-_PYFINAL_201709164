@@ -194,7 +194,7 @@ elses: telse tipodeelse{ $$=$2;}
        ;
 tipodeelse:llavea cuerpovoid llavec {$$= instruccionesAPI.nuevoelse($2);}
         |  tif para condicion parc llavea cuerpovoid llavec elses { $$=instruccionesAPI.nuevoif($3,$6,$8); }
-            | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
+         | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
 
 ;
 
@@ -214,11 +214,11 @@ condicion:condicion tmayor condicion {  $$ = instruccionesAPI.nuevoOperacionBina
              | error { $$=""; CErrores.Errores.add(new CNodoError.NodoError("SINTACTICO","No se esperaba el token: "+yytext,this._$.first_line,this._$.first_column));  }
 
         ;
-tipoDato:tint {$$=$1;}
- |tstring{$$=$1;}
- |tboolean{$$=$1;}
- |tdouble{$$=$1;}
- |tchar {$$=$1;} 
+tipoDato:tint {$$=TIPO_VALOR.INT;}
+ |tstring{$$=TIPO_VALOR.STRING;}
+ |tboolean{$$=TIPO_VALOR.BOOL;}
+ |tdouble{$$=TIPO_VALOR.DOUBLE;}
+ |tchar {$$=TIPO_VALOR.CHAR;} 
  
  ;
 ids: ids coma idr { $1.push($3) ; $$=$1;}

@@ -11,10 +11,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 	t := template.Must(template.ParseFiles("index.html"))
 	t.Execute(w,"")
 }
-func report(w http.ResponseWriter, r *http.Request) {
-	t := template.Must(template.ParseFiles("reporte.html"))
+func index2(w http.ResponseWriter, r *http.Request) {
+	t := template.Must(template.ParseFiles("index2.html"))
 	t.Execute(w,"")
 }
+
 
 func main() {
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
@@ -23,8 +24,7 @@ func main() {
      http.Handle("/dist/", http.StripPrefix("/dist/", http.FileServer(http.Dir("dist/"))))
 
 	http.HandleFunc("/", index)
-	http.HandleFunc("/otherPage", index)
-	http.HandleFunc("/reporte", report)
+	http.HandleFunc("/otherPage", index2)
 
 	fmt.Printf("Servidor escuchando en: http://localhost:8000/")
 	http.ListenAndServe(":8000", nil)
